@@ -3,11 +3,17 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\Admin\UserManagementController;
 use App\Http\Controllers\Api\Admin\ContentModerationController;
+use App\Http\Controllers\Api\ImageRetrievalController;
+use App\Http\Controllers\Api\Admin\PlantImageAdminController;
 
 // Các route API khác sẽ do TV2-7 thêm sau.
 
 // Nhóm API yêu cầu đăng nhập (guard web) + user không bị block
 Route::middleware(['auth:web', 'active_user'])->group(function () {
+
+    // Image retrieval - user search
+    Route::post('/plants/images/search', [ImageRetrievalController::class, 'search']);
+
 
     // =======================
     // ADMIN API
@@ -22,6 +28,10 @@ Route::middleware(['auth:web', 'active_user'])->group(function () {
         Route::delete('/questions/{question}', [ContentModerationController::class, 'deleteQuestion']);
         Route::delete('/posts/{post}', [ContentModerationController::class, 'deletePost']);
         Route::delete('/comments/{comment}', [ContentModerationController::class, 'deleteComment']);
+
+        // Plant images management (admin)
+        Route::post('/plants/{plant}/images', [PlantImageAdminController::class, 'store']);
+        Route::delete('/plant-images/{plantImage}', [PlantImageAdminController::class, 'destroy']);
     });
 
 });
