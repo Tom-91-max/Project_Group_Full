@@ -5,6 +5,21 @@ use App\Http\Controllers\Api\Admin\UserManagementController;
 use App\Http\Controllers\Api\Admin\ContentModerationController;
 
 // Các route API khác sẽ do TV2-7 thêm sau.
+use App\Http\Controllers\Api\WaterLogApiController;
+
+Route::middleware(['auth:web', 'active_user'])->group(function () {
+    // Lấy danh sách water logs của một tank
+    Route::get('/tanks/{tank}/water-logs', [WaterLogApiController::class, 'index']);
+    
+    // Tạo water log mới cho tank
+    Route::post('/tanks/{tank}/water-logs', [WaterLogApiController::class, 'store']);
+    
+    // Bonus: Chi tiết một log cụ thể (nếu cần)
+    Route::get('/water-logs/{waterLog}', [WaterLogApiController::class, 'show']);
+    
+    // Bonus: Xóa log (nếu cần)
+    Route::delete('/water-logs/{waterLog}', [WaterLogApiController::class, 'destroy']);
+});
 
 // Nhóm API yêu cầu đăng nhập (guard web) + user không bị block
 Route::middleware(['auth:web', 'active_user'])->group(function () {
