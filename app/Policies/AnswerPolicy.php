@@ -17,3 +17,12 @@ class AnswerPolicy
         return $user->isAdmin() || $user->id === $answer->user_id;
     }
 }
+
+
+
+
+
+
+
+
+

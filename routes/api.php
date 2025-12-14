@@ -1,59 +1,87 @@
 <?php
 
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Api\Admin\UserManagementController;
-use App\Http\Controllers\Api\Admin\ContentModerationController;
+use Illuminate\Support\Facades\Auth;
+use App\Http\Controllers\Api\QA\QuestionController;
+use App\Http\Controllers\Api\QA\AnswerController;
 
-// Các route API khác sẽ do TV2-7 thêm sau.
+/*
+|--------------------------------------------------------------------------
+| API LOGIN (TEST – SESSION AUTH)
+|--------------------------------------------------------------------------
+*/
 
-// Nhóm API yêu cầu đăng nhập (guard web) + user không bị block
-Route::middleware(['auth:web', 'active_user'])->group(function () {
+Route::post('/login', function (Request $request) {
+    $request->validate([
+        'email' => 'required|email'
+    ]);
 
-    // =======================
-    // ADMIN API
-    // =======================
-    Route::prefix('admin')->middleware('admin')->group(function () {
-        // User management
-        Route::get('/users', [UserManagementController::class, 'index']);
-        Route::patch('/users/{user}/role', [UserManagementController::class, 'updateRole']);
-        Route::patch('/users/{user}/status', [UserManagementController::class, 'updateStatus']);
+    $user = \App\Models\User::where('email', $request->email)->first();
 
-        // Content moderation
-        Route::delete('/questions/{question}', [ContentModerationController::class, 'deleteQuestion']);
-        Route::delete('/posts/{post}', [ContentModerationController::class, 'deletePost']);
-        Route::delete('/comments/{comment}', [ContentModerationController::class, 'deleteComment']);
-    });
+    if (! $user) {
+        return response()->json([
+            'success' => false,
+            'message' => 'User not found'
+        ], 404);
+    }
 
-});
-
-// Route test: xem user hiện tại (chỉ cần login + active_user)
-Route::middleware(['auth:web', 'active_user'])->get('/me', function (Request $request) {
-    $user = $request->user();
+    Auth::login($user);
 
     return response()->json([
         'success' => true,
-        'data'    => [
+        'message' => 'Logged in',
+        'data' => [
             'id'     => $user->id,
             'name'   => $user->name,
             'email'  => $user->email,
             'role'   => $user->role,
             'status' => $user->status,
-        ],
-        'message' => 'Current authenticated user',
+        ]
     ]);
 });
 
-// Route test: chỉ Admin mới vào được
-Route::middleware(['auth:web', 'active_user', 'admin'])->get('/admin/ping', function (Request $request) {
-    return response()->json([
-        'success' => true,
-        'data'    => [
-            'message' => 'Admin area OK',
-            'user'    => [
-                'id'   => $request->user()->id,
-                'name' => $request->user()->name,
+/*
+|--------------------------------------------------------------------------
+| AUTHENTICATED API
+|--------------------------------------------------------------------------
+*/
+
+Route::middleware(['auth:web', 'active_user'])->group(function () {
+
+    // Current user
+    Route::get('/me', function (Request $request) {
+        $user = $request->user();
+
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'id'     => $user->id,
+                'name'   => $user->name,
+                'email'  => $user->email,
+                'role'   => $user->role,
+                'status' => $user->status,
             ],
-        ],
-        'message' => 'You are admin and active.',
-    ]);
+            'message' => 'Current authenticated user',
+        ]);
+    });
+
+    /*
+    |--------------------------------------------------------------------------
+    | Q&A API – TV5
+    |--------------------------------------------------------------------------
+    */
+
+    // Questions
+    Route::get('/questions',        [QuestionController::class, 'index']);
+    Route::post('/questions',       [QuestionController::class, 'store']);
+    Route::get('/questions/{question}', [QuestionController::class, 'show']);
+    Route::put('/questions/{question}', [QuestionController::class, 'update']);
+    Route::delete('/questions/{question}', [QuestionController::class, 'destroy']);
+
+    // Answers
+    Route::post('/questions/{question}/answers', [AnswerController::class, 'store']);
+    Route::put('/answers/{answer}',   [AnswerController::class, 'update']);
+    Route::delete('/answers/{answer}',[AnswerController::class, 'destroy']);
+    Route::post('/answers/{answer}/accept', [AnswerController::class, 'accept']);
 });

@@ -30,3 +30,9 @@ class Answer extends Model
         return $this->belongsTo(User::class);
     }
 }
+
+
+
+
+
+
