@@ -17,3 +17,5 @@ class QuestionPolicy
         return $user->isAdmin() || $user->id === $question->user_id;
     }
 }
+
+
