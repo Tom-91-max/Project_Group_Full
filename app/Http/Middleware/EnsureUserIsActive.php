@@ -12,7 +12,6 @@ class EnsureUserIsActive
     {
         $user = $request->user();
 
-        // Chưa đăng nhập thì để middleware auth xử lý
         if (!$user) {
             return $next($request);
         }

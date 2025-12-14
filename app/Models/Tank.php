@@ -4,10 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Tank extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
     protected $fillable = [
         'user_id',
@@ -21,7 +22,9 @@ class Tank extends Model
     ];
 
     protected $casts = [
+        'volume_liters' => 'decimal:2',
         'co2' => 'boolean',
+        'deleted_at' => 'datetime',
     ];
 
     public function user()

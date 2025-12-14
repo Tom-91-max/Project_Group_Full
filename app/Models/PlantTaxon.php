@@ -6,28 +6,24 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Post extends Model
+class PlantTaxon extends Model
 {
     use HasFactory, SoftDeletes;
 
+    protected $table = 'plant_taxa';
+
     protected $fillable = [
-        'user_id',
-        'title',
-        'content',
-        'image_path',
+        'genus',
+        'species',
+        'family',
     ];
 
     protected $casts = [
         'deleted_at' => 'datetime',
     ];
 
-    public function user()
+    public function plants()
     {
-        return $this->belongsTo(User::class);
-    }
-
-    public function comments()
-    {
-        return $this->hasMany(Comment::class);
+        return $this->hasMany(Plant::class, 'taxon_id');
     }
 }

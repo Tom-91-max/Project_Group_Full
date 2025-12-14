@@ -4,10 +4,13 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class TankPlant extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
+
+    protected $table = 'tank_plants';
 
     protected $fillable = [
         'tank_id',
@@ -18,6 +21,7 @@ class TankPlant extends Model
 
     protected $casts = [
         'planted_at' => 'date',
+        'deleted_at' => 'datetime',
     ];
 
     public function tank()

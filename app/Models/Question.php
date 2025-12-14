@@ -4,10 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Question extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
     protected $fillable = [
         'user_id',
@@ -16,6 +17,10 @@ class Question extends Model
         'content',
         'image_path',
         'status',
+    ];
+
+    protected $casts = [
+        'deleted_at' => 'datetime',
     ];
 
     public function user()

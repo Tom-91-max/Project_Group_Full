@@ -4,10 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Answer extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
     protected $fillable = [
         'question_id',
@@ -18,6 +19,7 @@ class Answer extends Model
 
     protected $casts = [
         'is_accepted' => 'boolean',
+        'deleted_at' => 'datetime',
     ];
 
     public function question()

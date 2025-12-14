@@ -3,21 +3,22 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
 class User extends Authenticatable
 {
-    use HasFactory, Notifiable;
+    use HasFactory, Notifiable, SoftDeletes;
 
     protected $fillable = [
         'name',
         'email',
         'password',
         'role',
+        'status',
         'avatar',
         'bio',
-        'status',
     ];
 
     protected $hidden = [
@@ -26,10 +27,9 @@ class User extends Authenticatable
     ];
 
     protected $casts = [
-        'email_verified_at' => 'datetime',
+        'deleted_at' => 'datetime',
     ];
 
-    // Quan hệ
     public function tanks()
     {
         return $this->hasMany(Tank::class);
@@ -54,7 +54,7 @@ class User extends Authenticatable
     {
         return $this->hasMany(Comment::class);
     }
-    
+
     public function isAdmin(): bool
     {
         return $this->role === 'admin';
@@ -64,6 +64,7 @@ class User extends Authenticatable
     {
         return $this->role === 'expert';
     }
+
     public function isActive(): bool
     {
         return $this->status === 'active';
@@ -73,5 +74,4 @@ class User extends Authenticatable
     {
         return $this->status === 'blocked';
     }
-
 }
